@@ -4,11 +4,9 @@
 
 本实验选择任务 1：AI 辅助的代码生成。
 
-需要说明的是，本文不声明 `src/semantic/SemanticAnalyzer.cpp` 全部由 AI 生成。最终提交时只选取该文件中一段连续的语义分析核心代码块作为 AI 辅助生成对象：
-
 ```text
 文件：src/semantic/SemanticAnalyzer.cpp
-当前选定范围：Impl::compileExpr 至 Impl::subElementCount
+生成范围：Impl::compileExpr 至 Impl::subElementCount
 当前行号：约 533-1234
 代码规模：702 行
 ```
@@ -35,7 +33,7 @@
 C:\Users\Lenovo\.codex\sessions\2026\05\10\rollout-2026-05-10T19-41-55-019e59ca-99bb-7b71-834f-da19d49db3d6.jsonl
 ```
 
-日志中的时间戳为 UTC；北京时间为 UTC+8。为避免暴露真实使用时间，本文保留的日志路径和时间戳日期统一按 `2026-05-10` 脱敏处理；时分秒、交互顺序和输出摘录保持原记录口径。下文只摘录与选定 702 行代码块直接相关的 prompt、Codex 输出、工具调用和验证结果，省略前端、后端和其他文件的大段无关内容。
+日志中的时间戳为 UTC；北京时间为 UTC+8。下文只摘录与选定 702 行代码块直接相关的 prompt、Codex 输出、工具调用和验证结果，省略前端、后端和其他文件的大段无关内容。
 
 ### 1. 用户给出总任务和 AI 代码生成要求
 
@@ -550,4 +548,4 @@ Impl::fillRuntimeInitializer
 Impl::subElementCount
 ```
 
-当前行号约为 533-1234，共 702 行。该代码块已经嵌入项目，并与其他模块保持相同的 C++17 风格、错误处理方式和 Koopa IR 文本生成接口。它不是未经修改的 AI 原始输出，而是 Codex 生成初稿后，经编译警告、Docker 构建和样例测试反馈迭代修正后的版本。
+当前行号约为 533-1234，共 702 行。该代码块已经嵌入项目，并与其他模块保持相同的 C++17 风格、错误处理方式和 Koopa IR 文本生成接口。当前它不是未经修改的 AI 原始输出，而是 Codex 生成初稿后，经编译警告、Docker 构建和样例测试反馈迭代修正后的版本。

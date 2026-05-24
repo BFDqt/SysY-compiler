@@ -1,0 +1,64 @@
+const int N = 4;
+const int INF = 1000;
+
+int graph[4][4] = {
+  {0, 5, INF, 10},
+  {INF, 0, 3, INF},
+  {INF, INF, 0, 1},
+  {INF, INF, INF, 0}
+};
+
+int dist[4][4];
+
+void copy_graph(int src[][4], int dst[][4]) {
+  int i = 0;
+  while (i < N) {
+    int j = 0;
+    while (j < N) {
+      dst[i][j] = src[i][j];
+      j = j + 1;
+    }
+    i = i + 1;
+  }
+}
+
+void floyd(int d[][4]) {
+  int k = 0;
+  while (k < N) {
+    int i = 0;
+    while (i < N) {
+      int j = 0;
+      while (j < N) {
+        int through = d[i][k] + d[k][j];
+        if (through < d[i][j]) {
+          d[i][j] = through;
+        }
+        j = j + 1;
+      }
+      i = i + 1;
+    }
+    k = k + 1;
+  }
+}
+
+int reachable_sum(int d[][4]) {
+  int sum = 0;
+  int i = 0;
+  while (i < N) {
+    int j = 0;
+    while (j < N) {
+      if (d[i][j] < INF) {
+        sum = sum + d[i][j];
+      }
+      j = j + 1;
+    }
+    i = i + 1;
+  }
+  return sum;
+}
+
+int main() {
+  copy_graph(graph, dist);
+  floyd(dist);
+  return reachable_sum(dist);
+}
