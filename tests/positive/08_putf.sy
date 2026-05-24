@@ -1,0 +1,5 @@
+int main() {
+  int n = 65;
+  putf("%d:%c\n", n, n);
+  return 0;
+}

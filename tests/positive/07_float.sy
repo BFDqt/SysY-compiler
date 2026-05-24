@@ -1,0 +1,9 @@
+float half(float x) {
+  return x / 2.0;
+}
+
+int main() {
+  float x = half(7);
+  int y = x;
+  return y;
+}

@@ -1,0 +1,10 @@
+const int base = 6 * 7;
+
+int main() {
+  int a = base;
+  {
+    int a = 5;
+    a = a + 1;
+  }
+  return a;
+}

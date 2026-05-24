@@ -1,0 +1,10 @@
+build/
+build-*/
+out/
+*.koopa
+*.S
+*.o
+*.exe
+*.a
+*.so
+.cache/
