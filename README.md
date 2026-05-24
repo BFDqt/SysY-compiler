@@ -50,6 +50,28 @@ qemu-riscv32-static out
 echo $?
 ```
 
+## 一键运行测试文件
+
+如果助教给了一个新的 SysY 程序，例如 `case.sy`，推荐在 Docker 标准环境中直接用脚本跑完整链路：
+
+```bash
+bash scripts/run_case.sh case.sy
+```
+
+脚本会自动执行：
+
+```text
+构建 compiler -> 生成 Koopa -> 生成 RISC-V -> 链接 libsysy -> qemu 运行 -> 打印返回值
+```
+
+如果有输入文件，可以把输入文件作为第二个参数：
+
+```bash
+bash scripts/run_case.sh case.sy input.txt
+```
+
+在 Windows 下也可以直接把 `.sy` 文件拖到项目根目录的 `run-sysy.bat` 上运行；如果不拖文件，双击 `run-sysy.bat` 后按提示粘贴 `.sy` 文件路径也可以。该脚本会自动启动 `maxxing/compiler-dev` 容器执行测试，因此需要先打开 Docker Desktop。
+
 ## 项目结构
 
 ```text
