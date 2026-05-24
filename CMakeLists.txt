@@ -18,15 +18,15 @@ endif()
 
 BISON_TARGET(
     SysYParser
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontend/sysy.y
-    ${CMAKE_CURRENT_BINARY_DIR}/sysy_parser.cpp
-    DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/sysy_parser.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontend/compiler2022_x/FrontEnd/YaccLex/src/sysy.y
+    ${CMAKE_CURRENT_BINARY_DIR}/sysy.tab.cpp
+    DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/sysy.tab.hpp
 )
 
 FLEX_TARGET(
     SysYScanner
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontend/sysy.l
-    ${CMAKE_CURRENT_BINARY_DIR}/sysy_lexer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontend/compiler2022_x/FrontEnd/YaccLex/src/sysy.l
+    ${CMAKE_CURRENT_BINARY_DIR}/sysy.lex.cpp
 )
 
 ADD_FLEX_BISON_DEPENDENCY(SysYScanner SysYParser)
@@ -37,12 +37,16 @@ add_executable(compiler
     src/main.cpp
     src/ast/ast.cpp
     src/frontend/driver.cpp
+    src/frontend/compiler2022_x/FrontEnd/Parser.cpp
+    src/frontend/compiler2022_x/FrontEnd/YaccLex/src/YaccLex.cpp
+    src/frontend/compiler2022_x/FrontEnd/YaccLex/StrDump.cpp
     src/semantic/SemanticAnalyzer.cpp
     src/backend/RiscV.cpp
 )
 
 target_include_directories(compiler PRIVATE
     include
+    src/frontend/compiler2022_x
     ${CMAKE_CURRENT_BINARY_DIR}
     ${KOOPA_INCLUDE_DIR}
 )
