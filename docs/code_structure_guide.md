@@ -11,9 +11,9 @@
 ```text
 ├── src/main.cpp                        # 【1】总场控：负责串联所有模块的入口函数
 ├── src/frontend/                       # 【2】大前端：字符串源码 -> 抽象语法树(AST)
-│   ├── compiler2022_x/FrontEnd/YaccLex/src/sysy.l # Flex 词法规则文件：负责分词
-│   ├── compiler2022_x/FrontEnd/YaccLex/src/sysy.y # Bison 语法规则文件：负责组装树
-│   └── driver.cpp                      # 对象树适配器：将前端临时树转化为核心 AST
+│   ├── .../YaccLex/src/sysy.l          # Flex 词法规则文件：负责分词
+│   ├── .../YaccLex/src/sysy.y          # Bison 语法规则文件：负责组装树
+│   └── driver.cpp                      # 对象树转换层：将语法树转化为核心 AST
 ├── include/sysy/ast.hpp                # 【3】数据桥梁：AST 核心数据结构设计
 ├── src/semantic/SemanticAnalyzer.cpp   # 【4】编译器大脑：一趟遍历，完成检查并生成 Koopa IR 
 └── src/backend/RiscV.cpp               # 【5】打工人：纯粹的 Koopa IR -> RISC-V 汇编翻译机器
