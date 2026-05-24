@@ -370,7 +370,7 @@ cmake --build build -j
 ./build/compiler -riscv tests/positive/01_main.sy -o /tmp/01_main.S
 ```
 
-仓库中的 `scripts/run_smoke.sh` 会对 `tests/positive/*.sy` 逐个生成 Koopa 和 RISC-V。报告撰写时先在 Windows/WSL 下用已有 `build/compiler` 复核过生成流程；之后又使用 Docker Desktop 和 `maxxing/compiler-dev` 镜像，从当前工作区源码重新配置、构建，并在容器内完成汇编、链接和 qemu 运行。Docker 构建命令使用临时目录 `/tmp/sysy-report-build`，没有改写仓库内的 `build` 目录。
+仓库中的 `scripts/run_smoke.sh` 会对 tests/positive/*.sy 逐个生成 Koopa 和 RISC-V。报告撰写时先在 Windows/WSL 下用已有 `build/compiler` 复核过生成流程；之后又使用 Docker Desktop 和 `maxxing/compiler-dev` 镜像，从当前工作区源码重新配置、构建，并在容器内完成汇编、链接和 qemu 运行。Docker 构建命令使用临时目录 `/tmp/sysy-report-build`，没有改写仓库内的 `build` 目录。
 
 当前源码的 Docker 构建结果为成功：
 

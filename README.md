@@ -66,3 +66,10 @@ docs/                  实验报告和 AI 辅助代码生成记录
 ## 说明
 
 `-koopa` 模式用于展示中间代码；整数、数组、函数和控制流可直接交给 Koopa 工具链验证。float 运算通过项目内 RISC-V helper 完成，因此 float 用例建议使用 `-riscv` 模式验证。
+
+## 答辩速通
+
+如果你是第一次接触这个项目，建议先看以下三份专门为答辩准备的导读材料：
+- **[docs/beginner_guide.md](docs/beginner_guide.md)**：按“整体流程 -> 编译原理基础 -> 关键实现 -> 测试样例 -> 高频问答”顺序整理，适合快速理解项目主线和应对提问。
+- **[docs/code_structure_guide.md](docs/code_structure_guide.md)**：包含文件目录详解、核心函数速查以及用于拿分的技术亮点总结，极度适合“看着代码展示说明”使用。
+- **[docs/defense_demo_script.md](docs/defense_demo_script.md)**：包含可以直接复制的现场演示脚本、汇编知识速查以及“防翻车”预案。
