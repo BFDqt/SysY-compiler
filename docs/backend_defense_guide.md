@@ -186,7 +186,7 @@ add t0, t0, t1
 
 第一层是生成测试，也就是对 `tests/positive/*.sy` 全部执行 `-riscv`，确认后端不会遇到 unsupported instruction，也不会因为栈槽、地址计算、全局初始化等问题崩溃。这一层主要验证后端指令覆盖范围。
 
-第二层是运行测试，也就是把生成的 `.S` 用 RISC-V 工具链汇编、链接，再用 qemu 运行，检查退出码或输出。例如 `04_control.sy` 预期返回 24，验证分支和循环；`05_function_array.sy` 验证函数调用和数组参数；`06_global_multi_array.sy` 验证全局多维数组和地址计算；`07_float.sy` 验证 float helper；`08_putf.sy` 验证运行时库调用和输出。
+第二层是运行测试，也就是把生成的 `.S` 用 RISC-V 工具链汇编、链接，再用 qemu 运行，检查退出码或输出。例如 `04_control.sy` 预期返回 24，验证分支和循环；`05_function_array.sy` 验证函数调用和数组参数；`06_global_multi_array.sy` 验证全局多维数组和地址计算；`07_float.sy` 验证 float helper；`08_putf.sy` 验证运行时库调用和输出。新增的 `09_floyd_warshall.sy` 是一个更完整的小程序，用 Floyd-Warshall 最短路验证全局二维数组、数组参数、三重循环、条件更新和多函数调用，预期返回 30。
 
 第三层是人工检查关键汇编片段。例如查看函数开头是否正确调整 `sp`，非叶子函数是否保存和恢复 `ra`，call 前参数是否放入 `a0-a7`，数组访问是否生成了“基地址 + 下标 * 元素大小”的地址计算。
 
@@ -194,7 +194,25 @@ add t0, t0, t1
 
 ## 二、现场演示建议
 
-建议演示 `tests/positive/04_control.sy` 或 `tests/positive/06_global_multi_array.sy`。
+建议优先演示 `tests/positive/09_floyd_warshall.sy`。它比单点样例更完整，能说明后端不是只通过了碎片化测试。如果时间紧，再用 `tests/positive/04_control.sy` 或 `tests/positive/06_global_multi_array.sy` 补充解释控制流和数组地址计算。
+
+演示完整小程序：
+
+```bash
+cat tests/positive/09_floyd_warshall.sy
+./build/compiler -koopa tests/positive/09_floyd_warshall.sy -o /tmp/floyd.koopa
+./build/compiler -riscv tests/positive/09_floyd_warshall.sy -o /tmp/floyd.S
+cat /tmp/floyd.S
+```
+
+重点指出：
+
+- 这个程序实现 Floyd-Warshall 最短路，不是单一语法点测试。
+- `.data` 中有全局二维数组 `graph` 和全局结果数组 `dist`。
+- 汇编中会生成 `copy_graph`、`floyd`、`reachable_sum` 和 `main` 多个函数。
+- `floyd` 中有三重 `while` 循环，对应多个基本块和大量分支跳转。
+- 数组访问会触发 `getptr/getelemptr` 到 RISC-V 地址计算。
+- 程序预期返回 30，即所有可达最短路长度之和。
 
 演示控制流：
 
@@ -542,7 +560,46 @@ SysY 源码
 
 测试部分我们主要验证两类能力。第一类是正向样例，证明编译器能够正确处理表达式、控制流、函数调用、数组、float 和输出函数等语言结构。第二类是负向样例，证明编译器不仅能生成代码，也能识别并拒绝不合法的 SysY 程序。
 
-### 2. 推荐现场演示样例一：控制流
+### 2. 推荐现场演示样例一：完整 Floyd-Warshall 小程序
+
+如果希望展示一个更完整的小程序，优先演示 `tests/positive/09_floyd_warshall.sy`。这个样例实现的是 Floyd-Warshall 最短路算法，规模不大，但比单点样例更接近真实程序。
+
+可以先展示源码：
+
+```bash
+cat tests/positive/09_floyd_warshall.sy
+```
+
+讲解话术：
+
+这个样例里，程序先把全局二维数组 `graph` 复制到 `dist`，再调用 `floyd` 做三重循环的最短路松弛，最后用 `reachable_sum` 统计所有可达最短路长度之和。它覆盖了全局二维数组、数组作为函数参数、多函数调用、嵌套循环、条件更新和数组寻址。预期返回值是 30。
+
+然后生成 Koopa IR 和 RISC-V 汇编：
+
+```bash
+./build/compiler -koopa tests/positive/09_floyd_warshall.sy -o /tmp/floyd.koopa
+./build/compiler -riscv tests/positive/09_floyd_warshall.sy -o /tmp/floyd.S
+cat /tmp/floyd.S
+```
+
+讲解话术：
+
+在汇编中可以看到 `.data` 段里有 `graph` 和 `dist` 两个全局对象；`.text` 段里有 `copy_graph`、`floyd`、`reachable_sum` 和 `main` 多个函数。`floyd` 的三重循环会生成多组基本块标签和分支跳转，数组访问会生成“基地址 + 下标 * 元素大小”的地址计算。这个样例能综合验证后端的全局数据、函数调用、栈帧、控制流和数组寻址。
+
+如果现场环境支持链接和 qemu，可以继续运行：
+
+```bash
+clang /tmp/floyd.S -c -o /tmp/floyd.o -target riscv32-unknown-linux-elf -march=rv32imf -mabi=ilp32
+ld.lld /tmp/floyd.o -L"$CDE_LIBRARY_PATH/riscv32" -lsysy -o /tmp/floyd
+qemu-riscv32-static /tmp/floyd
+echo $?
+```
+
+讲解话术：
+
+最后输出的退出码应该是 30。这个返回值来自最短路矩阵中所有可达路径长度的求和，可以作为这个完整小程序的正确性校验。
+
+### 3. 推荐现场演示样例二：控制流
 
 推荐先演示 `tests/positive/04_control.sy`。这个样例包含 `while`、`if`、`continue` 和 `break`，适合展示从控制流到 RISC-V 分支跳转的过程。
 
@@ -591,7 +648,7 @@ echo $?
 
 最后输出的退出码就是 SysY `main` 函数的返回值。这个样例的预期返回值是 24，用它可以证明控制流和后端分支跳转生成是正确的。
 
-### 3. 推荐现场演示样例二：全局多维数组
+### 4. 推荐现场演示样例三：全局多维数组
 
 如果老师更关心数组，可以演示 `tests/positive/06_global_multi_array.sy`。
 
@@ -623,7 +680,7 @@ g:
 
 这说明数组初始化被展开到了 `.data` 段，未显式初始化的位置补 0。访问数组元素时，后端通过“基地址 + 下标 * 元素大小”的方式计算地址。
 
-### 4. 推荐现场演示样例三：float helper
+### 5. 推荐现场演示样例四：float helper
 
 如果要展示 float，可以演示 `tests/positive/07_float.sy`。
 
@@ -638,7 +695,7 @@ cat /tmp/float.S
 
 这个样例会触发 float 除法和 float 到 int 的转换。我们的 Koopa 主体仍然按 32 位值传递 float 的 bit pattern，后端只在确实使用 float 运算时追加 helper。例如可以看到 `__sysy_fdiv` 和 `__sysy_f2i`。这部分使用 RV32F 指令，所以 float 样例运行时需要 `-march=rv32imf`。
 
-### 5. 负向样例演示
+### 6. 负向样例演示
 
 负向测试用于说明编译器不仅能生成代码，还能检查语义错误。
 
@@ -667,13 +724,13 @@ cat tests/negative/04_call_args.sy
 - `02_const_assign.sy`：给 const 对象赋值。
 - `03_bad_break.sy`：循环外使用 `break`。
 
-### 6. 测试部分总结
+### 7. 测试部分总结
 
 可以这样收尾：
 
-通过这些样例，我们验证了编译器的两类能力。正向样例覆盖表达式、控制流、函数调用、数组和 float，能够完整生成 Koopa IR 和 RISC-V 汇编；负向样例覆盖重复定义、const 赋值、非法 break 和函数参数不匹配，能够在语义阶段正确报错。因此这个项目不是只完成了代码生成，还实现了从源码检查到目标代码生成的完整闭环。
+通过这些样例，我们验证了编译器的两类能力。正向样例覆盖表达式、控制流、函数调用、数组和 float，其中 `09_floyd_warshall.sy` 还提供了一个更完整的算法小程序，用来验证多个模块组合后的后端稳定性；负向样例覆盖重复定义、const 赋值、非法 break 和函数参数不匹配，能够在语义阶段正确报错。因此这个项目不是只完成了代码生成，还实现了从源码检查到目标代码生成的完整闭环。
 
-### 7. 后端测试策略专用稿
+### 8. 后端测试策略专用稿
 
 如果老师要求你单独说明后端怎么测试，可以这样讲：
 
@@ -681,7 +738,7 @@ cat tests/negative/04_call_args.sy
 
 生成验证是最基础的一层。我会对所有正向样例执行 `-riscv`，确认后端可以把 Koopa IR 转成汇编，不会因为某类 Koopa 指令没有覆盖而失败。这一层主要覆盖 `load`、`store`、`binary`、`branch`、`jump`、`call`、`return`、`getptr/getelemptr` 和全局初始化。
 
-运行验证是更关键的一层。汇编文件生成后，还需要用 RISC-V 工具链汇编、链接，并通过 qemu 运行。比如 `04_control.sy` 用返回值 24 验证循环和分支，`05_function_array.sy` 验证函数调用和数组传参，`06_global_multi_array.sy` 验证 `.data` 段和多维数组寻址，`07_float.sy` 验证 float helper，`08_putf.sy` 验证运行时库调用和输出。
+运行验证是更关键的一层。汇编文件生成后，还需要用 RISC-V 工具链汇编、链接，并通过 qemu 运行。比如 `04_control.sy` 用返回值 24 验证循环和分支，`05_function_array.sy` 验证函数调用和数组传参，`06_global_multi_array.sy` 验证 `.data` 段和多维数组寻址，`07_float.sy` 验证 float helper，`08_putf.sy` 验证运行时库调用和输出，`09_floyd_warshall.sy` 用预期返回值 30 验证一个更完整的多函数算法程序。
 
 人工检查主要是针对后端容易出错的地方。比如检查函数入口是否有 `addi sp, sp, -frameSize`，函数退出是否恢复 `sp`，有函数调用时是否保存 `ra`，调用前是否把参数放到 `a0-a7`，超过 8 个参数时是否使用 outgoing argument 区域，数组访问是否按元素大小计算偏移。
 

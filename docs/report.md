@@ -411,6 +411,7 @@ cmake --build build -j
 | `06_global_multi_array.sy` | 全局多维数组初始化、数组参数 `a[][3]` | Docker qemu 退出码 5 |
 | `07_float.sy` | float 运算、int/float 隐式转换 | Docker qemu 退出码 3 |
 | `08_putf.sy` | `putf` 降低到 `putint`/`putch` | 输出 `65:A`，Docker qemu 退出码 0 |
+| `09_floyd_warshall.sy` | Floyd-Warshall 最短路完整小程序：全局二维数组、数组参数、三重循环、条件更新、多函数调用 | WSL 已验证 Koopa 和 RISC-V 汇编生成；预期 qemu 退出码 30 |
 
 需要说明的是，`02_expr.sy` 的源码返回值为：
 
@@ -431,7 +432,7 @@ cmake --build build -j
 
 负向样例的错误类型均正确，但当前前端转换层没有完整保留真实源码位置，因此行列号统一显示为 `1:1`。当前报告按最终源码复核结果记录为 `1:1`。
 
-本次复核还对所有正向样例执行了 RISC-V 生成、链接和 qemu 运行，关键输出如下：
+本次复核还对原有 8 个正向样例执行了 RISC-V 生成、链接和 qemu 运行，关键输出如下：
 
 ```text
 == 01_main ==
@@ -452,6 +453,8 @@ exit=3
 65:A
 exit=0
 ```
+
+为避免测试样例过于碎片化，后续又新增了 `tests/positive/09_floyd_warshall.sy`。该样例实现了 Floyd-Warshall 最短路：先把全局二维数组 `graph` 复制到 `dist`，再通过 `floyd` 函数执行三重循环松弛，最后用 `reachable_sum` 统计所有可达最短路长度之和。该程序覆盖全局数据段、数组作为函数参数、多函数调用、嵌套循环、条件更新、数组寻址和后端栈帧生成等多个组合场景。当前环境下已复核它可以生成 Koopa IR 和 RISC-V 汇编；按源码语义，最终返回值应为 30，适合作为答辩现场的完整小程序演示样例。
 
 ## 10. 当前实现的不足
 
