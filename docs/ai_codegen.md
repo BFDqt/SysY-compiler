@@ -12,24 +12,6 @@ src/semantic/SemanticAnalyzer.cpp
 
 该文件为语义分析核心实现，代码规模超过 500 行，已嵌入项目并保持项目 C++17 风格。
 
-## Prompt
-
-```text
-请为一个 C++17 SysY2022 编译器生成语义分析与 Koopa IR 生成模块。
-
-项目约束：
-1. 前端已经通过 Flex/Bison 构造 AST。
-2. 需要支持 int、float、void、字符串字面量、标量变量、常量、多维数组、数组参数、函数定义与调用。
-3. 需要实现栈式作用域符号表，记录变量名、常量名、函数名、类型、作用域、数组维度、函数参数。
-4. 需要检查重复定义、未定义使用、const 赋值、函数参数匹配、return 类型、break/continue 位置、数组维度和初始化器。
-5. 需要生成 Koopa IR。标准整数、数组、指针、控制流使用 Koopa；float 以 32 位 bit pattern 表示，并降低为 helper 调用。
-6. 需要实现 if、while、break、continue、return、短路 && 和 ||。
-7. 需要实现全局变量、局部变量、常量表达式求值、数组初始化按行优先展开。
-8. 代码应可维护，函数职责清晰，错误通过 CompileError 携带 SourceLocation 抛出。
-
-请输出完整的 C++ 源文件实现，注释保持克制，只在复杂逻辑附近说明。
-```
-
 ## 交互记录摘要
 
 以下内容摘自本机 Codex 会话日志：
@@ -54,20 +36,19 @@ payload.type: user_message
 用户请求摘录：
 
 ```text
-PLEASE IMPLEMENT THIS PLAN:
-# SysY2022 编译器从零实现计划
+请为一个 C++17 SysY2022 编译器生成语义分析与 Koopa IR 生成模块。
 
-## Summary
-- 从空目录重新搭建 C++17 项目，标准环境使用 Docker `maxxing/compiler-dev`，目标架构选 RISC-V。
-- 必须使用 Flex + Bison 完成词法/语法分析，生成 AST 后做语义分析，再输出 Koopa IR，并由 Koopa raw program 后端生成 RISC-V 汇编。
-- 最终可执行文件命名为 `compiler`，支持：
-  - `./compiler -koopa input.sy -o output.koopa`
-  - `./compiler -riscv input.sy -o output.S`
+项目约束：
+1. 前端已经通过 Flex/Bison 构造 AST。
+2. 需要支持 int、float、void、字符串字面量、标量变量、常量、多维数组、数组参数、函数定义与调用。
+3. 需要实现栈式作用域符号表，记录变量名、常量名、函数名、类型、作用域、数组维度、函数参数。
+4. 需要检查重复定义、未定义使用、const 赋值、函数参数匹配、return 类型、break/continue 位置、数组维度和初始化器。
+5. 需要生成 Koopa IR。标准整数、数组、指针、控制流使用 Koopa；float 以 32 位 bit pattern 表示，并降低为 helper 调用。
+6. 需要实现 if、while、break、continue、return、短路 && 和 ||。
+7. 需要实现全局变量、局部变量、常量表达式求值、数组初始化按行优先展开。
+8. 代码应可维护，函数职责清晰，错误通过 CompileError 携带 SourceLocation 抛出。
 
-AI 附加任务：
-- 选择“AI 辅助代码生成”。
-- 目标代码块为 `src/semantic/SemanticAnalyzer.cpp` 中语义分析核心，最终不少于 500 行。
-- `docs/ai_codegen.md` 保存 prompt、交互摘要、最终生成代码说明，报告中引用该文档。
+请输出完整的 C++ 源文件实现，注释保持克制，只在复杂逻辑附近说明。
 ```
 
 ### 2. Codex 生成语义分析主文件
