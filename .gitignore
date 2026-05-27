@@ -2,6 +2,7 @@ build/
 build-*/
 out/
 temp/
+docs/
 *.koopa
 *.S
 *.o
@@ -11,4 +12,4 @@ temp/
 *.pptx
 .cache/
 ~$*
-docs/
+
