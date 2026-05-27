@@ -85,7 +85,7 @@ src/frontend/driver.cpp             493 行
 | AST、公共接口与入口 | `src/ast/ast.cpp`、`src/main.cpp`、`include/sysy/*.hpp` | 747 | 16.4% |
 | 合计 | 当前构建链路中的主要实现代码 | 4568 | 100.0% |
 
-其中 `SemanticAnalyzer.cpp` 是语义分析和 Koopa IR 生成的核心文件，也是本实验选择的 AI 辅助代码生成目标代码块。
+其中 `SemanticAnalyzer.cpp` 是语义分析和 Koopa IR 生成的核心文件，也是本实验选择的 AI 辅助代码生成代码块所在文件。实际作为报告对象的是其中 `Impl::compileExpr` 到 `Impl::subElementCount` 的连续实现片段。
 
 ## 4. 前端设计与实现过程
 
@@ -322,10 +322,13 @@ float helper 只在语义层记录到实际使用时追加。例如 `__sysy_fadd
 本实验选择的 AI 辅助任务是“AI 辅助的代码生成”，目标代码块为：
 
 ```text
-src/semantic/SemanticAnalyzer.cpp
+文件：src/semantic/SemanticAnalyzer.cpp
+生成范围：Impl::compileExpr 至 Impl::subElementCount
+当前行号：约 533-1234
+代码规模：702 行
 ```
 
-该文件最终 1520 行，超过任务要求的 500 行。完整 prompt、交互摘要和关键补丁已整理到 `docs/ai_codegen.md`。本次撰写报告时曾尝试检查其中记录的原始 Codex jsonl 路径，但该原始日志文件在当前机器路径下已经不存在；因此本报告关于 AI 交互过程的直接依据是已经纳入仓库的 `docs/ai_codegen.md`，并结合当前源码进行复核。
+选定代码块共 702 行，超过任务要求的 500 行；不是把整个语义分析文件都作为 AI 生成材料。完整 prompt、交互摘要和关键补丁已整理到 `docs/ai_codegen.md` 附录中。本次撰写报告时曾尝试检查其中记录的原始 Codex jsonl 路径，但该原始日志文件在当前机器路径下已经不存在；因此本报告关于 AI 交互过程的直接依据是已经纳入仓库的 `docs/ai_codegen.md`，并结合当前源码进行复核。
 
 AI 初始生成的语义分析模块已经包含主要框架：`TypeInfo`、`FunctionInfo`、`Symbol`、`Scope`、`ExprResult`、`LValueResult`，以及运行时函数安装、函数签名收集、声明编译、语句编译、表达式编译、常量表达式求值和 Koopa 文本输出。
 

@@ -23,14 +23,28 @@
 
 第三，这段代码容易通过测试反馈验证。短路求值、函数数组参数、多维数组初始化、`%` 运算类型限制等都可以用小样例直接暴露问题，因此适合作为“AI 生成初稿 + 人工复核修正”的记录对象。
 
-实际效果是：Codex 初次生成后给出了可维护的主体结构，包括 `ExprResult`、`LValueResult`、`compileExpr`、`compileBinary`、`compileCall`、`compileLValue`、`evalConstExpr`、`flattenConstInitializer` 等核心函数；但初稿并非直接正确，后续通过编译检查和测试暴露并修正了数组退化、Koopa 函数形参命名、`%` 类型限制、多维数组初始化展开等问题。
+实际效果是：Codex 初次生成后给出了可维护的主体结构，代表性类型和函数包括：
+
+```text
+ExprResult
+LValueResult
+compileExpr
+compileBinary
+compileCall
+compileLValue
+evalConstExpr
+flattenConstInitializer
+```
+
+但初稿并非直接正确，后续通过编译检查和测试暴露并修正了数组退化、Koopa 函数形参命名、`%` 类型限制、多维数组初始化展开等问题。
 
 ## 交互记录摘要
 
 以下摘要来自本机 Codex 会话日志：
 
 ```text
-C:\Users\Lenovo\.codex\sessions\2026\05\10\rollout-2026-05-10T19-41-55-019e59ca-99bb-7b71-834f-da19d49db3d6.jsonl
+C:\Users\Lenovo\.codex\sessions\2026\05\10\
+rollout-2026-05-10T19-41-55-019e59ca-99bb-7b71-834f-da19d49db3d6.jsonl
 ```
 
 日志中的时间戳为 UTC；北京时间为 UTC+8。下文只摘录与选定 702 行代码块直接相关的 prompt、Codex 输出、工具调用和验证结果，省略前端、后端和其他文件的大段无关内容。
@@ -437,7 +451,17 @@ global @g = alloc [[i32, 3], 2], {{1, 2, 0}, {3, 4, 5}}
 exit=5
 ```
 
-这个修正后来沉淀为当前选定代码块中的 `flattenRuntimeInitializer`、`fillConstInitializer`、`fillRuntimeInitializer`、`subElementCount` 和 `alignInitializerPosition` 等函数。它保证：
+这个修正后来沉淀为当前选定代码块中的以下函数：
+
+```text
+flattenRuntimeInitializer
+fillConstInitializer
+fillRuntimeInitializer
+subElementCount
+alignInitializerPosition
+```
+
+它保证：
 
 ```c
 int g[2][3] = {{1, 2}, {3, 4, 5}};

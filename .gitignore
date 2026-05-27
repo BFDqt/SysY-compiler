@@ -8,5 +8,7 @@ temp/
 *.exe
 *.a
 *.so
+*.pptx
 .cache/
 ~$*
+docs/
